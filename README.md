@@ -5,16 +5,16 @@ To save change Log For A Table Entry we have:
 
 1. Create data model
 
-public class ChangeLog
-    {
-        [Key]
-        public int Id { get; set; }
-        public string TableName { get; set; }
-        public string ColumnName { get; set; }
-        public string OldValue { get; set; }
-        public string NewValue { get; set; }
-        public DateTime DateChanged { get; set; }
-    }
+            public class ChangeLog
+            {
+               [Key]
+               public int Id { get; set; }
+               public string TableName { get; set; }
+               public string ColumnName { get; set; }
+               public string OldValue { get; set; }
+               public string NewValue { get; set; }
+               public DateTime DateChanged { get; set; }
+            }
     
 2. modyfiy DbContex
   2.1 Add table object 
