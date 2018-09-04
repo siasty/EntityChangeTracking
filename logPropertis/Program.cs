@@ -12,9 +12,9 @@ namespace logPropertis
             using( var db = new MyDbContext())
             {
                 var test = db.Test.Find(1);
-                test.B = "test1Updsdfdgdfg";
+                test.B = "test123g";
                 db.Test.Attach(test);
-                db.Entry(test).State = EntityState.Modified;
+            //    db.Entry(test).State = EntityState.Modified;
                 DisplayTrackedEntities(db.ChangeTracker);
                 db.SaveChanges();
 
@@ -33,12 +33,17 @@ namespace logPropertis
             var entries = changeTracker.Entries();
             foreach (var entry in entries)
             {
-                Console.WriteLine("Entity Name: {0}", entry.Entity.GetType().FullName);
+                Console.WriteLine("Table Name: {0}", entry.Entity.GetType().Name);
                 Console.WriteLine("Status: {0}", entry.State);
                 foreach (var prop in entry.OriginalValues.Properties)
                 {
-                    Console.WriteLine("Orginal: name {0} value {1} ",prop.Name, entry.OriginalValues[prop].ToString());
-                    Console.WriteLine("Current: name {0} value {1}", prop.Name, entry.CurrentValues[prop].ToString());
+                    var originalValue = entry.OriginalValues[prop].ToString();
+                    var currentValue =  entry.CurrentValues[prop].ToString();
+                    if (originalValue != currentValue)
+                    {
+                        Console.WriteLine("Orginal: Column Name {0} value {1} ", prop.Name, entry.OriginalValues[prop].ToString());
+                        Console.WriteLine("Current: Column Name {0} value {1}", prop.Name, entry.CurrentValues[prop].ToString());
+                    }
                 }
             }
             Console.WriteLine("");
