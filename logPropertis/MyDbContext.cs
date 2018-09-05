@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,29 +25,56 @@ namespace logPropertis
 
         public override int SaveChanges()
         {
-            var modifiedEntities = ChangeTracker.Entries()
-                .Where(p => p.State == EntityState.Modified).ToList();
+            var modifiedEntities = ChangeTracker.Entries().ToList();
             var now = DateTime.Now;
+            string rowId = null;
 
             foreach (var change in modifiedEntities)
             {
                 var entityName = change.Entity.GetType().Name;
+                var entityState = change.State;
 
-                foreach (var prop in change.OriginalValues.Properties)
+                foreach (var prop in change.OriginalValues.Properties.Cast<IProperty>().Select((r, i) => new { Name = r.Name, Index = i }))
                 {
-                    var originalValue = change.OriginalValues[prop].ToString();
-                    var currentValue  = change.CurrentValues[prop].ToString();
-                    if (originalValue != currentValue)
+                    rowId = change.OriginalValues["Id"].ToString();
+
+                    if (entityState == EntityState.Modified)
                     {
-                        ChangeLog log = new ChangeLog()
+                        var originalValue = change.OriginalValues[prop.Name].ToString();
+                        var currentValue = change.CurrentValues[prop.Name].ToString();
+                        if (originalValue != currentValue)
                         {
-                            TableName = entityName,
-                            ColumnName = prop.Name,
-                            OldValue = originalValue,
-                            NewValue = currentValue,
-                            DateChanged = now
-                        };
-                        ChangeLogs.Add(log);
+                            ChangeLog log = new ChangeLog()
+                            {
+                                TableName = entityName,
+                                ColumnName = prop.Name,
+                                RowId = rowId,
+                                State = entityState.ToString(),
+                                OldValue = originalValue,
+                                NewValue = currentValue,
+                                DateChanged = now
+                            };
+                            ChangeLogs.Add(log);
+                        } 
+                    }
+                    else if (entityState == EntityState.Deleted)
+                    {
+                        if(prop.Index == 1)
+                        {
+                         
+                            ChangeLog log = new ChangeLog()
+                            {
+
+                                TableName = entityName,
+                                ColumnName = "",
+                                RowId = rowId,
+                                State = entityState.ToString(),
+                                OldValue = "",
+                                NewValue = "",
+                                DateChanged = now
+                            };
+                            ChangeLogs.Add(log);
+                        }
                     }
                 }
             }
