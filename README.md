@@ -7,13 +7,15 @@ To save change Log For A Table Entry we have:
 
             public class ChangeLog
             {
-               [Key]
-               public int Id { get; set; }
-               public string TableName { get; set; }
-               public string ColumnName { get; set; }
-               public string OldValue { get; set; }
-               public string NewValue { get; set; }
-               public DateTime DateChanged { get; set; }
+              [Key]
+              public int Id { get; set; }
+              public string TableName { get; set; }
+              public string ColumnName { get; set; }
+              public string RowId { get; set; }
+              public string State { get; set; }
+              public string OldValue { get; set; }
+              public string NewValue { get; set; }
+              public DateTime DateChanged { get; set; }
             }
     
 2. modyfiy DbContex
