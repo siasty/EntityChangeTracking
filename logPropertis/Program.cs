@@ -11,16 +11,39 @@ namespace logPropertis
         {
             using( var db = new MyDbContext())
             {
-                var test = db.Test.Find(1);
+               
+                // add value if not exist
+                if (!db.Test.Any())
+                {
+                    var add = new Test();
+                        add.A = "test1";
+                        add.B = "test1";
+                    db.Test.Add(add);
+                      DisplayTrackedEntities(db.ChangeTracker); // Display tracking
+                    db.SaveChanges();
+                }
+
+                // find and modify
+                var test = db.Test.FirstOrDefault();
                 test.B = "test123g";
                 db.Test.Attach(test);
-            //    db.Entry(test).State = EntityState.Modified;
-                DisplayTrackedEntities(db.ChangeTracker);
+                  DisplayTrackedEntities(db.ChangeTracker);
                 db.SaveChanges();
 
-                
+                // find and delete
+                test = db.Test.FirstOrDefault();
+                db.Test.Remove(test);
+                  DisplayTrackedEntities(db.ChangeTracker);
+                db.SaveChanges();
 
-                Console.WriteLine(db.Test.Find(1).B);
+
+
+                // View Logs 
+                foreach (var log in db.ChangeLogs.ToList())
+                {
+                    Console.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7}", log.Id, log.TableName,log.ColumnName,log.RowId, log.State, log.OldValue, log.NewValue, log.DateChanged);
+                }
+        
 
             }
             Console.ReadKey();
